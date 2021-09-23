@@ -7,6 +7,8 @@ import android.widget.EditText
 import android.widget.TextView
 import com.example.dynamiccode.R
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,7 +45,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun exectue(code: String): String {
-        Compiler().execute()
+        Executors.newSingleThreadExecutor().execute {
+            Compiler().execute("https://github.com/nitin070895a/DynamicCode/blob/master/app/src/main/java/com/example/TestCode.java")
+        }
         return "Error: Not Implemented"
     }
 }
