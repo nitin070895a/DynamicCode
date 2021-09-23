@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DynamicCode</string>
+    <string name="enter_code_here">Enter code here...</string>
+    <string name="execute">Execute</string>
+</resources>
