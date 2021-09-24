@@ -62,6 +62,7 @@ public class Compiler {
             inputStream.close();
 
         } catch (IOException e) {
+            print("Exception: Opening the jar file");
             e.printStackTrace();
         }
 
@@ -84,8 +85,14 @@ public class Compiler {
                 callbacks.onResult((String) result);
             }
 
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-            | NoSuchMethodException | InvocationTargetException e) {
+        } catch (ClassNotFoundException e) {
+            print("Exception: Dynamic class not found");
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            print("Exception: Dynamic method not found");
+            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            print("Exception: Dynamic code execution");
             e.printStackTrace();
         }
     }
