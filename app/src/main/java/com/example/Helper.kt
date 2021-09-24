@@ -7,7 +7,10 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-private const val BUF_SIZE = 8 * 1024 // Copy buffer size
+/**
+ * Copy buffer size
+ */
+private const val BUF_SIZE = 8 * 1024
 
 /**
  * Returns the current time in HH:mm:ss.SSS format

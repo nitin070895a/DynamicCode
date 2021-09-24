@@ -1,7 +1,6 @@
 package com.example;
 
 import android.content.Context;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.concurrent.Executors;
-
 import dalvik.system.DexClassLoader;
 
 /**
@@ -17,6 +15,9 @@ import dalvik.system.DexClassLoader;
  */
 public class Compiler {
 
+    private static final String URL = "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar";  // Dynamic jar library
+    private static final String CLASS = "NumberProcessor";                // Class to load
+    private static final String METHOD = "getRandomResponse";             // Method to execute
     private static final String DEX_NAME = "NumberProcessorDex.jar";      // File name to be stored
 
     private final ExecutionCallbacks callbacks;                           // Execution callbacks
@@ -46,15 +47,13 @@ public class Compiler {
      */
     private void run(Context context, int number)
     {
-        String uri = "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar";
-       
         String dexPath = "";
         try {
     
-            print("Opening jar file stream from url:" + uri + "...");
-            URL url = new URL(uri);
+            print("Opening jar file stream from url: " + URL);
+            URL url = new URL(URL);
             BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
-            //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Loading from assets
+            //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Assets
 
             print("Writing file in dex folder...");
             dexPath = HelperKt.downloadDex(context, inputStream, DEX_NAME);
@@ -69,15 +68,18 @@ public class Compiler {
         print("Creating class loader...");
         final File outDexPath = context.getDir("outdex", Context.MODE_PRIVATE);
         DexClassLoader dexLoader = new DexClassLoader(
-            dexPath, outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
+            dexPath,
+            outDexPath.getAbsolutePath(),
+            null
+            , this.getClass().getClassLoader()
         );
 
         try {
 
             print("Getting class...");
-            Class<?> numberProcessor = dexLoader.loadClass("NumberProcessor");
-            Object instance = numberProcessor.newInstance();
-            Method method = numberProcessor.getMethod("getRandomResponse", int.class);
+            Class<?> cls = dexLoader.loadClass(CLASS);
+            Object instance = cls.newInstance();
+            Method method = cls.getMethod(METHOD, int.class);
             print("Invoking method...");
             Object result = method.invoke(instance, number);
 

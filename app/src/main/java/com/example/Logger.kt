@@ -14,7 +14,7 @@ class Logger {
      */
     fun log(msg: String?) {
         _log.append(getTime())
-        _log.append(">>  ")
+        _log.append(" >>  ")
         _log.append(msg)
         _log.append("\n")
     }
@@ -25,11 +25,11 @@ class Logger {
     fun logBoxed(msg: String?) {
         _log.append("\n")
         _log.append(getTime())
-        _log.append(">>---------------OUTPUT-------------------<<\n\n")
+        _log.append(" >>---------------OUTPUT-------------------<<\n\n")
         _log.append(msg)
         _log.append("\n")
         _log.append(getTime())
-        _log.append(">>---------------OUTPUT-------------------<<\n")
+        _log.append(" >>---------------OUTPUT-------------------<<\n")
     }
 
     /**
