@@ -39,10 +39,10 @@ public class Compiler {
             URL url = new URL("https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar");
             BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
             //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Loading from assets
-            print("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar...\n\n");
+            print("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar...");
 
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dexPath));
-            print("Writing file in dex folder...\n\n");
+            print("Writing file in dex folder...");
 
             byte[] buffer = new byte[BUF_SIZE];
             int len;
@@ -57,7 +57,7 @@ public class Compiler {
             e.printStackTrace();
         }
 
-        print("Creating class loader...\n");
+        print("Creating class loader...");
         final File outDexPath = context.getDir("outdex", Context.MODE_PRIVATE);
         DexClassLoader dexLoader = new DexClassLoader(
             dexPath.getAbsolutePath(), outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
@@ -65,11 +65,11 @@ public class Compiler {
 
         try {
 
-            print("Getting class...\n");
+            print("Getting class...");
             Class<?> numberProcessor = dexLoader.loadClass("NumberProcessor");
             Object instance = numberProcessor.newInstance();
             Method method = numberProcessor.getMethod("getRandomResponse", int.class);
-            print("Invoking method...\n\n");
+            print("Invoking method...");
             Object result = method.invoke(instance, number);
 
             if (callbacks != null) {
@@ -89,7 +89,7 @@ public class Compiler {
 
     interface Callbacks {
 
-        void log(String message);
+        void log(String msg);
 
         void onResult(String result);
     }
