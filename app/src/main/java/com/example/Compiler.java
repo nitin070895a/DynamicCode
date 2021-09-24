@@ -10,16 +10,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.concurrent.Executors;
 
 import dalvik.system.DexClassLoader;
 
 public class Compiler {
 
-    private static final String SECONDARY_DEX_NAME = "NumberProcessorDex.jar";
+    private static final String DEX_NAME = "NumberProcessorDex.jar";
     private static final int BUF_SIZE = 8 * 1024;
 
-    private Callbacks callbacks;
+    private final Callbacks callbacks;
+    private StringBuilder sb;
 
     Compiler(Callbacks callbacks) {
         this.callbacks = callbacks;
@@ -30,43 +32,52 @@ public class Compiler {
     }
 
     void run(Context context, int number) {
+        sb = new StringBuilder();
 
-        File dexInternalStoragePath = new File(context.getDir("dex", Context.MODE_PRIVATE), SECONDARY_DEX_NAME);
-        BufferedInputStream bis;
-        OutputStream dexWriter;
+        File dexPath = new File(context.getDir("dex", Context.MODE_PRIVATE), DEX_NAME);
 
         try {
-            bis = new BufferedInputStream(context.getAssets().open(SECONDARY_DEX_NAME));
-            dexWriter = new BufferedOutputStream(new FileOutputStream(dexInternalStoragePath));
-            byte[] buf = new byte[BUF_SIZE];
+
+            URL url = new URL("https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar ...");
+            BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
+            //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Loading from assets
+            sb.append("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar\n\n");
+
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dexPath));
+            sb.append("Writing file in dex folder...\n\n\n");
+
+            byte[] buffer = new byte[BUF_SIZE];
             int len;
-            while ((len = bis.read(buf, 0, BUF_SIZE)) > 0) {
-                dexWriter.write(buf, 0, len);
+            while ((len = inputStream.read(buffer, 0, BUF_SIZE)) > 0) {
+                outputStream.write(buffer, 0, len);
             }
-            dexWriter.close();
-            bis.close();
+
+            outputStream.close();
+            inputStream.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        final File optimizedDexOutputPath = context.getDir("outdex", Context.MODE_PRIVATE);
-
+        sb.append("Creating class loader...\n");
+        final File outDexPath = context.getDir("outdex", Context.MODE_PRIVATE);
         DexClassLoader dexLoader = new DexClassLoader(
-            dexInternalStoragePath.getAbsolutePath(),
-            optimizedDexOutputPath.getAbsolutePath(),
-            null,
-            this.getClass().getClassLoader()
+            dexPath.getAbsolutePath(), outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
         );
 
         try {
 
+            sb.append("Getting class...\n");
             Class<?> numberProcessor = dexLoader.loadClass("NumberProcessor");
             Object instance = numberProcessor.newInstance();
             Method method = numberProcessor.getMethod("getRandomResponse", int.class);
+            sb.append("Invoking method...\n\n");
             Object result = method.invoke(instance, number);
 
-            if (callbacks != null)
-                callbacks.onResult((String) result);
+            if (callbacks != null) {
+                sb.append(result);
+                callbacks.onResult(sb.toString());
+            }
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
             | NoSuchMethodException | InvocationTargetException e) {
