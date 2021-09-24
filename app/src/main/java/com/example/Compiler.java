@@ -13,10 +13,14 @@ public class Compiler {
         try {
             URLClassLoader loader = URLClassLoader.newInstance(new URL[] {new URL(url)}, this.getClass().getClassLoader());
             Class<?> cls = loader.loadClass("com.example.TestCode");
-            Object instance = cls.getConstructor().newInstance();
-            Method[] m = cls.getMethods();
-            cls.getMethod("toString").invoke(instance);
-            
+
+            Object o = cls.getConstructor().newInstance();
+            Method m = cls.getMethod("testing");
+            m.invoke(o);
+
+//            Method[] m = cls.getMethods();
+//            cls.getMethod("TestCode$testing").invoke(null);
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
