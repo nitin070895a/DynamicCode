@@ -46,10 +46,11 @@ class MainActivity : AppCompatActivity() {
 
     fun exectue(code: String): String {
         Executors.newSingleThreadExecutor().execute {
-            Compiler().execute(
-                this,
-                "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/java/com/example/MyJar.jar"
-            )
+//            Compiler().execute1(
+//                this,
+//                "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/java/com/example/DexJar.jar"
+//            )
+            Compiler().execute(this)
         }
         return "Error: Not Implemented"
     }
