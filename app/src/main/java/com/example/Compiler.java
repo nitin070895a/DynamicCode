@@ -15,7 +15,8 @@ import dalvik.system.DexClassLoader;
  */
 public class Compiler {
 
-    private static final String URL = "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar";  // Dynamic jar library
+    private static final String URL = "https://github.com/nitin070895a/DynamicCode/raw/" +
+        "master/app/src/main/assets/NumberProcessorDex.jar";              // Dynamic jar library
     private static final String CLASS = "NumberProcessor";                // Class to load
     private static final String METHOD = "getRandomResponse";             // Method to execute
     private static final String DEX_NAME = "NumberProcessorDex.jar";      // File name to be stored
@@ -57,6 +58,7 @@ public class Compiler {
 
             print("Writing file in dex folder...");
             dexPath = HelperKt.downloadDex(context, inputStream, DEX_NAME);
+            print("File written at: " + dexPath);
             
             inputStream.close();
 
@@ -76,11 +78,11 @@ public class Compiler {
 
         try {
 
-            print("Getting class...");
+            print("Getting class: " + CLASS + " ...");
             Class<?> cls = dexLoader.loadClass(CLASS);
             Object instance = cls.newInstance();
             Method method = cls.getMethod(METHOD, int.class);
-            print("Invoking method...");
+            print("Invoking method: " + METHOD + " ...");
             Object result = method.invoke(instance, number);
 
             if (callbacks != null) {
