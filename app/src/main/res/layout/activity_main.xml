@@ -29,7 +29,7 @@
         android:autofillHints=""
         android:inputType="number"
         android:layout_margin="20dp"
-        android:hint="@string/enter_your_number"/>
+        android:hint="@string/enter_a_number"/>
 
     <Button
         android:id="@+id/button"

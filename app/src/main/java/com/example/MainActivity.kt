@@ -8,6 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dynamiccode.R
 import com.google.android.material.snackbar.Snackbar
+import java.lang.StringBuilder
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity(), Compiler.Callbacks {
 
@@ -16,6 +19,7 @@ class MainActivity : AppCompatActivity(), Compiler.Callbacks {
     private lateinit var output: TextView
 
     private val _compiler = Compiler(this)
+    private var _log = StringBuilder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,11 +33,42 @@ class MainActivity : AppCompatActivity(), Compiler.Callbacks {
 
             editText.text?.toString()?.let {
 
-                if (it.isNotEmpty()) execute(it.toInt())
+                if (it.isNotEmpty()) {
+                    val number = it.toInt()
+                    if (number < 10000) execute(number)
+                    else showMessage("Number should be less than 10000")
+                }
                 else showMessage(msg = "Nothing to process")
             }
         }
 
+    }
+
+    override fun log(message: String?) {
+        _log.append(getTime())
+        _log.append(">>  ")
+        _log.append(message)
+        updateLog()
+    }
+
+    override fun onResult(result: String?) {
+        _log.append(getTime())
+        _log.append(">>----------------------------------<<\n")
+        _log.append(result)
+        _log.append(getTime())
+        _log.append(">>----------------------------------<<\n")
+        updateLog()
+    }
+
+    private fun updateLog() {
+
+        runOnUiThread {
+            output.text = _log.toString()
+        }
+    }
+
+    fun getTime(): String? {
+        return SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(Date())
     }
 
     @Suppress("SameParameterValue")
@@ -43,15 +78,10 @@ class MainActivity : AppCompatActivity(), Compiler.Callbacks {
 
     @SuppressLint("SetTextI18n")
     fun execute(number: Int) {
-        output.text = "Executing code..."
+
+        _log = StringBuilder("Executing code...\n\n")
+        updateLog()
 
         _compiler.execute(this, number)
     }
-
-    override fun onResult(result: String?) {
-        runOnUiThread {
-            output.text = result ?: "Error"
-        }
-    }
-
 }

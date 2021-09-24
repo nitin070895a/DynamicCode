@@ -21,7 +21,6 @@ public class Compiler {
     private static final int BUF_SIZE = 8 * 1024;
 
     private final Callbacks callbacks;
-    private StringBuilder sb;
 
     Compiler(Callbacks callbacks) {
         this.callbacks = callbacks;
@@ -32,19 +31,18 @@ public class Compiler {
     }
 
     void run(Context context, int number) {
-        sb = new StringBuilder();
 
         File dexPath = new File(context.getDir("dex", Context.MODE_PRIVATE), DEX_NAME);
 
         try {
 
-            URL url = new URL("https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar ...");
+            URL url = new URL("https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar");
             BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
             //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Loading from assets
-            sb.append("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar\n\n");
+            print("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar...\n\n");
 
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dexPath));
-            sb.append("Writing file in dex folder...\n\n\n");
+            print("Writing file in dex folder...\n\n");
 
             byte[] buffer = new byte[BUF_SIZE];
             int len;
@@ -59,7 +57,7 @@ public class Compiler {
             e.printStackTrace();
         }
 
-        sb.append("Creating class loader...\n");
+        print("Creating class loader...\n");
         final File outDexPath = context.getDir("outdex", Context.MODE_PRIVATE);
         DexClassLoader dexLoader = new DexClassLoader(
             dexPath.getAbsolutePath(), outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
@@ -67,16 +65,15 @@ public class Compiler {
 
         try {
 
-            sb.append("Getting class...\n");
+            print("Getting class...\n");
             Class<?> numberProcessor = dexLoader.loadClass("NumberProcessor");
             Object instance = numberProcessor.newInstance();
             Method method = numberProcessor.getMethod("getRandomResponse", int.class);
-            sb.append("Invoking method...\n\n");
+            print("Invoking method...\n\n");
             Object result = method.invoke(instance, number);
 
             if (callbacks != null) {
-                sb.append(result);
-                callbacks.onResult(sb.toString());
+                callbacks.onResult((String) result);
             }
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -84,8 +81,15 @@ public class Compiler {
             e.printStackTrace();
         }
     }
+    
+    void print(String msg) {
+        if (callbacks != null)
+            callbacks.log(msg);
+    }
 
     interface Callbacks {
+
+        void log(String message);
 
         void onResult(String result);
     }
