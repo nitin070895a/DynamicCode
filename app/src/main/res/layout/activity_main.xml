@@ -4,16 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
+
     android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:text="@string/dynamic_number_manipulator"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/desc"/>
 
     <EditText
         android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
         android:autofillHints=""
-        android:inputType="textMultiLine"
-        android:layout_marginTop="10dp"
-        android:hint="@string/enter_code_here"/>
+        android:inputType="number"
+        android:layout_margin="20dp"
+        android:hint="@string/enter_your_number"/>
 
     <Button
         android:id="@+id/button"
@@ -25,6 +41,7 @@
     <TextView
         android:id="@+id/output"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp" />
 
 </LinearLayout>

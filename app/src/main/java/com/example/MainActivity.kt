@@ -1,20 +1,21 @@
 package com.example
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.dynamiccode.R
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Compiler.Callbacks {
 
     private lateinit var button: Button
     private lateinit var editText: EditText
     private lateinit var output: TextView
+
+    private val _compiler = Compiler(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,30 +29,29 @@ class MainActivity : AppCompatActivity() {
 
             editText.text?.toString()?.let {
 
-                if (it.isNotEmpty()) runCode(it)
-                else showMessage(msg = "Nothing to execute")
+                if (it.isNotEmpty()) execute(it.toInt())
+                else showMessage(msg = "Nothing to process")
             }
         }
 
     }
 
+    @Suppress("SameParameterValue")
     private fun showMessage(msg: String) {
         Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT).show()
     }
 
-    fun runCode(code: String) {
-        output.text = ""
-        output.text = exectue(code)
+    @SuppressLint("SetTextI18n")
+    fun execute(number: Int) {
+        output.text = "Executing code..."
+
+        _compiler.execute(this, number)
     }
 
-    fun exectue(code: String): String {
-        Executors.newSingleThreadExecutor().execute {
-//            Compiler().execute1(
-//                this,
-//                "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/java/com/example/DexJar.jar"
-//            )
-            Compiler().execute(this)
+    override fun onResult(result: String?) {
+        runOnUiThread {
+            output.text = result ?: "Error"
         }
-        return "Error: Not Implemented"
     }
+
 }
