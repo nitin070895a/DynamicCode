@@ -11,7 +11,7 @@ import com.example.dynamiccode.R
 /**
  * The Main Activity with demonstration of the project
  */
-class MainActivity : AppCompatActivity(), Compiler.Callbacks, View.OnClickListener {
+class MainActivity : AppCompatActivity(), ExecutionCallbacks, View.OnClickListener {
 
     // UI
     private lateinit var button: Button

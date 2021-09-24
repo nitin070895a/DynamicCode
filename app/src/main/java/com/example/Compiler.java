@@ -3,11 +3,8 @@ package com.example;
 import android.content.Context;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -15,42 +12,53 @@ import java.util.concurrent.Executors;
 
 import dalvik.system.DexClassLoader;
 
+/**
+ * Dynamic code executor,
+ */
 public class Compiler {
 
-    private static final String DEX_NAME = "NumberProcessorDex.jar";
-    private static final int BUF_SIZE = 8 * 1024;
+    private static final String DEX_NAME = "NumberProcessorDex.jar";      // File name to be stored
 
-    private final Callbacks callbacks;
-
-    Compiler(Callbacks callbacks) {
+    private final ExecutionCallbacks callbacks;                           // Execution callbacks
+    
+    /**
+     * Constructor
+     * @param callbacks Events callbacks for code execution
+     */
+    Compiler(ExecutionCallbacks callbacks) {
         this.callbacks = callbacks;
     }
-
-    void execute(Context context, int number) {
-        Executors.newSingleThreadExecutor().execute(() -> Compiler.this.run(context, number));
+    
+    /**
+     * Broadcast a log event on the {@link this#callbacks}
+     * @param msg The message to be logged
+     */
+    private void print(String msg) {
+        if (callbacks != null)
+            callbacks.log(msg);
     }
-
-    void run(Context context, int number) {
-
-        File dexPath = new File(context.getDir("dex", Context.MODE_PRIVATE), DEX_NAME);
-
+    
+    /**
+     * Executes the dynamic code
+     *
+     * @param context The context of the activity
+     * @param number The number to be processed
+     */
+    private void run(Context context, int number)
+    {
+        String uri = "https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar";
+       
+        String dexPath = "";
         try {
-
-            URL url = new URL("https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar");
+    
+            print("Opening jar file stream from url:" + uri + "...");
+            URL url = new URL(uri);
             BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
             //inputStream = new BufferedInputStream(context.getAssets().open(DEX_NAME)); // Loading from assets
-            print("Opening jar file stream from url: https://github.com/nitin070895a/DynamicCode/raw/master/app/src/main/assets/NumberProcessorDex.jar...");
 
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(dexPath));
             print("Writing file in dex folder...");
-
-            byte[] buffer = new byte[BUF_SIZE];
-            int len;
-            while ((len = inputStream.read(buffer, 0, BUF_SIZE)) > 0) {
-                outputStream.write(buffer, 0, len);
-            }
-
-            outputStream.close();
+            dexPath = HelperKt.downloadDex(context, inputStream, DEX_NAME);
+            
             inputStream.close();
 
         } catch (IOException e) {
@@ -60,7 +68,7 @@ public class Compiler {
         print("Creating class loader...");
         final File outDexPath = context.getDir("outdex", Context.MODE_PRIVATE);
         DexClassLoader dexLoader = new DexClassLoader(
-            dexPath.getAbsolutePath(), outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
+            dexPath, outDexPath.getAbsolutePath(), null, this.getClass().getClassLoader()
         );
 
         try {
@@ -82,15 +90,13 @@ public class Compiler {
         }
     }
     
-    void print(String msg) {
-        if (callbacks != null)
-            callbacks.log(msg);
-    }
-
-    interface Callbacks {
-
-        void log(String msg);
-
-        void onResult(String result);
+    /**
+     * Executes the dynamic code asynchronously
+     *
+     * @param context The context of the activity
+     * @param number The number to be processed
+     */
+    void execute(Context context, int number) {
+        Executors.newSingleThreadExecutor().execute(() -> Compiler.this.run(context, number));
     }
 }
